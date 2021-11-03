@@ -189,7 +189,6 @@ GET  http://localhost:3000/employees
 </tbody>
 </table>
 
-### Read
 
 ### Vertical Filtering (Columns)
 
@@ -310,3 +309,43 @@ GET  http://localhost:3000/employees?or=(salary.gte.15000,salary.lte.12000)
 ```
 
 ## Ordering 
+
+**Default ascending**
+
+```
+GET  http://localhost:3000/employees?select=id,first_name&order=first_name
+
+[
+    {
+        "id": 2,
+        "first_name": "Mark"
+    },
+    {
+        "id": 1,
+        "first_name": "Siri"
+    }
+]
+```
+
+**Descending**
+
+```
+GET  http://localhost:3000/employees?order=salary.desc
+
+[
+    {
+        "id": 2,
+        "first_name": "Mark",
+        "last_name": "Stone",
+        "salary": 20000,
+        "department": "Analyst"
+    },
+    {
+        "id": 1,
+        "first_name": "Siri",
+        "last_name": "Hunt",
+        "salary": 10000,
+        "department": "HR"
+    }
+]
+```
