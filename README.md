@@ -53,6 +53,7 @@ grant usage on schema api to web_anon;
 grant select on api.employees to web_anon;
 grant insert on api.employees to web_anon;
 grant update on api.employees to web_anon;
+grant delete on api.employees to web_anon;
 
 ```
 
@@ -405,5 +406,42 @@ PUT  http://localhost:3000/employees?id=eq.3
     "last_name": "Doe",
     "salary": 60000,
     "department": "Manager"
+}
+```
+
+**UPSERT**
+
+We can make an **UPSERT** with `POST` and the `Prefer: resolution=merge-duplicates` header:
+
+```
+POST  http://localhost:3000/employees
+
+[
+    {
+        "id": 3,
+        "first_name": "John",
+        "last_name": "Doe",
+        "salary": 50000,
+        "department": "Manager"
+    },
+    {
+        "id": 6,
+        "first_name": "Deepika",
+        "last_name": "Das",
+        "salary": 40000,
+        "department": "Analyst"
+    }
+]
+```
+
+## Delete 
+
+**Single Delete**
+
+```
+DELETE  http://localhost:3000/employees?id=eq.6
+
+{
+    "id": 6
 }
 ```
