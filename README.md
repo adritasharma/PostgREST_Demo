@@ -248,11 +248,31 @@ GET  http://localhost:3000/employees?select=first_name,salary::text
 
 ### Horizontal Filtering (Rows)
 
+**Equals**
+
+```
+GET  http://localhost:3000/employees?id=eq.1
+
+Response:
+
+[
+    {
+        "id": 1,
+        "first_name": "Siri",
+        "last_name": "Hunt",
+        "salary": 10000,
+        "department": "HR"
+    }
+]
+```
+
 
 **Less Than**
 
 ```
 GET  http://localhost:3000/employees?salary=lt.15000
+
+Response:
 
 [
     {
@@ -269,6 +289,8 @@ GET  http://localhost:3000/employees?salary=lt.15000
 
 ```
 GET  http://localhost:3000/employees?salary=gte.10000
+
+Response:
 
 [
     {
@@ -292,6 +314,8 @@ GET  http://localhost:3000/employees?salary=gte.10000
 
 ```
 GET  http://localhost:3000/employees?or=(salary.gte.15000,salary.lte.12000)
+
+Response:
 
 [
     {
@@ -318,6 +342,8 @@ GET  http://localhost:3000/employees?or=(salary.gte.15000,salary.lte.12000)
 ```
 GET  http://localhost:3000/employees?select=id,first_name&order=first_name
 
+Response:
+
 [
     {
         "id": 2,
@@ -334,6 +360,8 @@ GET  http://localhost:3000/employees?select=id,first_name&order=first_name
 
 ```
 GET  http://localhost:3000/employees?order=salary.desc
+
+Response:
 
 [
     {
@@ -361,6 +389,8 @@ GET  http://localhost:3000/employees?order=salary.desc
 ```
 POST  http://localhost:3000/employees
 
+BODY:
+
 {
     "id": 3,
     "first_name": "John",
@@ -374,6 +404,8 @@ POST  http://localhost:3000/employees
 
 ```
 POST  http://localhost:3000/employees
+
+BODY:
 
 [
     {
@@ -400,6 +432,8 @@ POST  http://localhost:3000/employees
 ```
 PUT  http://localhost:3000/employees?id=eq.3
 
+BODY:
+
 {
     "id": 3,
     "first_name": "John",
@@ -415,6 +449,8 @@ We can make an **UPSERT** with `POST` and the `Prefer: resolution=merge-duplicat
 
 ```
 POST  http://localhost:3000/employees
+
+BODY:
 
 [
     {
@@ -441,7 +477,95 @@ POST  http://localhost:3000/employees
 ```
 DELETE  http://localhost:3000/employees?id=eq.6
 
+BODY:
+
 {
     "id": 6
 }
+```
+
+# Function
+
+### Function Without Parameters
+
+**Create Function**
+
+```
+CREATE FUNCTION api.totalsalary()
+RETURNS integer AS $$
+ SELECT
+ SUM(salary)
+ FROM api.Employees
+$$ LANGUAGE SQL IMMUTABLE;
+```
+
+
+**Test Function**
+
+```
+select api.totalsalary()
+```
+**Request**
+
+Functions are exposed under the `/rpc` prefix
+
+- Restart the server after creating any Function `postgrest connection.conf`:
+
+
+```
+POST  http://localhost:3000/rpc/totalsalary
+```
+
+### Function With Parameters
+
+**Create Function**
+
+```
+CREATE FUNCTION api.updatesalary(percentage INT)
+RETURNS void AS $$
+ UPDATE api.Employees 
+ SET salary= salary + (salary * percentage / 100);
+$$ LANGUAGE SQL VOLATILE;
+```
+
+
+**Test Function**
+
+```
+select api.updatesalary(10)
+```
+**Request**
+
+```
+POST  http://localhost:3000/rpc/updatesalary
+
+BODY:
+
+{
+    "percentage": 10
+}
+```
+
+# Stored Procedures
+
+**Create Procedure**
+
+```
+CREATE OR REPLACE PROCEDURE api.updatesalary  
+(  
+    percentage INT
+)  
+LANGUAGE plpgsql AS  
+$$  
+BEGIN         
+   UPDATE api.Employees 
+   SET salary= salary + (salary * percentage / 100);
+END  
+$$;
+```
+
+**Test Procedure**
+
+```
+CALL updatesalary(10)
 ```
