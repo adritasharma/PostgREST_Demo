@@ -51,6 +51,8 @@ create role web_anon nologin;
 
 grant usage on schema api to web_anon;
 grant select on api.employees to web_anon;
+grant insert on api.employees to web_anon;
+grant update on api.employees to web_anon;
 
 ```
 
@@ -348,4 +350,60 @@ GET  http://localhost:3000/employees?order=salary.desc
         "department": "HR"
     }
 ]
+```
+
+
+## Insert 
+
+**Single Insert**
+
+```
+POST  http://localhost:3000/employees
+
+{
+    "id": 3,
+    "first_name": "John",
+    "last_name": "Doe",
+    "salary": 30000,
+    "department": "Manager"
+}
+```
+
+**Bulk Insert**
+
+```
+POST  http://localhost:3000/employees
+
+[
+    {
+        "id": 4,
+        "first_name": "Jane",
+        "last_name": "Doe",
+        "salary": 25000,
+        "department": "Admin"
+    },
+    {
+        "id": 5,
+        "first_name": "Tom",
+        "last_name": "Doe",
+        "salary": 10000,
+        "department": "Staff"
+    }
+]
+```
+
+## Update 
+
+**Single Update**
+
+```
+PUT  http://localhost:3000/employees?id=eq.3
+
+{
+    "id": 3,
+    "first_name": "John",
+    "last_name": "Doe",
+    "salary": 60000,
+    "department": "Manager"
+}
 ```
